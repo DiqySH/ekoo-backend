@@ -11,7 +11,7 @@ export const chat = async (
   messages: { role: "system" | "user" | "assistant"; content: string }[]
 ) => {
   const res = await ai.chat.completions.create({
-    model: "llama-3.1-8b-instant",
+    model: "meta-llama/llama-4-scout-17b-16e-instruct",
     messages,
   });
 
