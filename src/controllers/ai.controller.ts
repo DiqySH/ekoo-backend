@@ -5,6 +5,8 @@ export const chatController = async (req: Request, res: Response) => {
   try {
     const { messages } = req.body;
 
+    console.log("INCOMING MESSAGES:", JSON.stringify(messages, null, 2));
+
     if (!messages || !Array.isArray(messages)) {
       return res.status(400).json({
         message: "messages must be an array",
@@ -17,12 +19,14 @@ export const chatController = async (req: Request, res: Response) => {
       success: true,
       data: result,
     });
-  } catch (error) {
-    console.error("AI Controller Error:", error);
+  } catch (error: any) {
+    console.error("AI Controller Error:");
+    console.error(error?.response?.data || error?.message || error);
 
     res.status(500).json({
       success: false,
       message: "AI processing failed",
+      error: error?.message,
     });
   }
 };
