@@ -1,8 +1,11 @@
 import { Router } from "express";
 import { chatController } from "../controllers/ai.controller";
+import { validate, commonValidators } from "../middlewares/validateInput";
 
 const router = Router();
 
-router.post("/chat", chatController);
+const chatValidation = validate([commonValidators.messages]);
+
+router.post("/chat", chatValidation, chatController);
 
 export default router;

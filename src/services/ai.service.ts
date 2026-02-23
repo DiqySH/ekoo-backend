@@ -1,13 +1,20 @@
-import { ai } from "../lib/ai";
-import type { ChatCompletionMessageParam } from "groq-sdk/resources/chat/completions";
+import { ai, AI_CONFIG, ChatCompletionMessageParam } from "../lib/ai";
+
+export interface ChatCompletionOptions {
+  model?: string;
+  temperature?: number;
+  maxTokens?: number;
+}
 
 export const chatCompletion = async (
-  messages: ChatCompletionMessageParam[]
-) => {
+  messages: ChatCompletionMessageParam[],
+  options?: ChatCompletionOptions,
+): Promise<string> => {
   const completion = await ai.chat.completions.create({
-    model: "meta-llama/llama-4-scout-17b-16e-instruct",
+    model: options?.model || AI_CONFIG.MODEL,
     messages,
-    temperature: 0.7,
+    temperature: options?.temperature || AI_CONFIG.TEMPERATURE,
+    max_tokens: options?.maxTokens || AI_CONFIG.MAX_TOKENS,
   });
 
   return completion.choices[0]?.message.content ?? "";

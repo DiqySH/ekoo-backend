@@ -1,28 +1,39 @@
 import { database } from "../lib/database";
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
+import { ValidationError, NotFoundError } from "../utils/AppError";
 
-export const getProfile = async (req: Request, res: Response) => {
-  const { uid } = req.params;
+export const getProfile = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { uid } = req.params;
 
-  if (!uid)
-    return res.status(400).json({
-      success: false,
-      message: "UID is required",
+    if (!uid) {
+      return next(new ValidationError("UID is required"));
+    }
+
+    if (typeof uid !== "string" || uid.trim().length === 0) {
+      return next(new ValidationError("Invalid UID format"));
+    }
+
+    const { data, error } = await database
+      .from("profiles")
+      .select("*")
+      .eq("user_uid", uid)
+      .single();
+
+    if (error || !data) {
+      return next(new NotFoundError("Profile doesn't exist"));
+    }
+
+    res.status(200).json({
+      success: true,
+      data,
     });
-
-  const { data } = await database
-    .from("profiles")
-    .select("*")
-    .eq("user_uid", uid);
-
-  if (!data || data.length === 0)
-    return res.status(404).json({
-      success: false,
-      message: "Profile doesn't exist",
-    });
-
-  res.status(200).json({
-    success: true,
-    data: data[0],
-  });
+  } catch (error: any) {
+    console.error("[User Controller Error]:", error?.message || error);
+    next(error);
+  }
 };
