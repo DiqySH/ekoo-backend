@@ -7,6 +7,18 @@ if (!SUPABASE_URL || !SUPABASE_KEY) {
   throw Error("Supabase URL and Supabase Key is required!");
 }
 
-const database = createClient(SUPABASE_URL, SUPABASE_KEY);
-
-export { database };
+export const createDatabaseClient = (token?: string) => {
+  return createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY,
+    token
+      ? {
+          global: {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        }
+      : {},
+  );
+};

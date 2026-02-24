@@ -1,6 +1,6 @@
-import { database } from "../lib/database";
+import { createDatabaseClient } from "../lib/database";
 import { Request, Response, NextFunction } from "express";
-import { ValidationError, NotFoundError } from "../utils/AppError";
+import { ValidationError, NotFoundError, AppError } from "../utils/AppError";
 
 export const getProfile = async (
   req: Request,
@@ -8,6 +8,9 @@ export const getProfile = async (
   next: NextFunction,
 ) => {
   try {
+    const token = req.headers.authorization?.replace("Bearer ", "");
+    if (!token) return next(new AppError("Token Required", 500));
+    const database = createDatabaseClient(token);
     const { uid } = req.params;
 
     if (!uid) {

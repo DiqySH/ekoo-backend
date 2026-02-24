@@ -1,15 +1,19 @@
 import dotenv from "dotenv";
 import express, { Request, Response } from "express";
 import cors from "cors";
-import aiRoutes from "./routes/ai.route";
-import userRoutes from "./routes/user.route";
+import chatbotRoutes from "./routes/chatbot.routes";
+import userRoutes from "./routes/user.routes";
+import walletRoutes from "./routes/wallet.routes";
 import { errorHandler } from "./middlewares/errorHandler";
+import helmet from "helmet";
 
 dotenv.config();
 
 const PORT = Number(process.env.PORT) || 3333;
 
 const app = express();
+
+app.use(helmet());
 
 app.use(express.json({ limit: "20mb" }));
 app.use(express.urlencoded({ extended: true, limit: "20mb" }));
@@ -23,8 +27,9 @@ app.get("/", (_: Request, res: Response) => {
   });
 });
 
-app.use("/api/ai", aiRoutes);
+app.use("/api/chatbot", chatbotRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/wallets", walletRoutes);
 
 app.use(errorHandler);
 
